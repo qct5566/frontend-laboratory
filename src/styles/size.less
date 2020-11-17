@@ -1,0 +1,131 @@
+@import "./variable.less";
+
+.@{common-prefix} {
+  .loop(@counter) when (@counter >= 0) {
+    &-p@{counter} {
+      padding: (1px * @counter) !important;
+    }
+    &-pd@{counter} {
+      padding: (1px * @counter) !important;
+    }
+    &-plr@{counter} {
+      padding-left: (1px * @counter) !important;
+      padding-right: (1px * @counter) !important;
+    }
+    &-ptb@{counter} {
+      padding-top: (1px * @counter) !important;
+      padding-bottom: (1px * @counter) !important;
+    }
+    &-pt@{counter} {
+      padding-top: (1px * @counter) !important;
+    }
+    &-pr@{counter} {
+      padding-right: (1px * @counter) !important;
+    }
+    &-pb@{counter} {
+      padding-bottom: (1px * @counter) !important;
+    }
+    &-pl@{counter} {
+      padding-left: (1px * @counter) !important;
+    }
+    &-m@{counter} {
+      margin: (1px * @counter) !important;
+    }
+    &-mg@{counter} {
+      margin: (1px * @counter) !important;
+    }
+    &-mt@{counter} {
+      margin-top: (1px * @counter) !important;
+    }
+    &-mlr@{counter} {
+      margin-left: (1px * @counter) !important;
+      margin-right: (1px * @counter) !important;
+    }
+    &-mtb@{counter} {
+      margin-top: (1px * @counter) !important;
+      margin-bottom: (1px * @counter) !important;
+    }
+    &-mr@{counter} {
+      margin-right: (1px * @counter) !important;
+    }
+    &-mb@{counter} {
+      margin-bottom: (1px * @counter) !important;
+    }
+    &-ml@{counter} {
+      margin-left: (1px * @counter) !important;
+    }
+    &-fs@{counter} {
+      font-size: (1px * @counter) !important;
+    }
+    &-br@{counter} {
+      border-radius: (1px * @counter) !important;
+    }
+    .loop((@counter - 1)); // 递归调用自身
+  }
+
+  .loop(50);
+
+  @step: 5; //渐变值
+  // 宽度 .w20{width:20px}
+  @maxSize: 1000;
+  .size(@maxSize);
+  .size(@n, @i: 10) when (@i =< @n) {
+    &-w@{i} {
+      width: 0px + @i !important;
+    }
+    &-mw@{i} {
+      min-width: 0px + @i !important;
+    }
+    &-mxw@{i} {
+      max-width: 0px + @i !important;
+    }
+    &-h@{i} {
+      height: 0px + @i;
+    }
+    &-mh@{i} {
+      min-height: 0px + @i !important;
+    }
+    &-mxh@{i} {
+      max-height: 0px + @i !important;
+    }
+    &-lh@{i} {
+      line-height: 0px + @i;
+    }
+    .size(@n, (@i+ @step));
+  }
+
+  @fwSize: 7;
+  .fwSize(@fwSize);
+  .fwSize(@n) when ( @n > 0) {
+    &-fw@{n} {
+      font-weight: @n*100;
+    }
+    .fwSize((@n - 1));
+  }
+  // 宽度 .wp5{width:5%}
+  @maxPercen: 100; //最大上限
+  .ww(@maxPercen);
+  .ww(@n, @i: 0) when (@i =< @n) {
+    &-wp@{i} {
+      width: @i+0%;
+    }
+    &-hp@{i} {
+      height: @i+0%;
+    }
+    &-vh@{i} {
+      height: @i+0vh;
+    }
+    &-minvh@{i} {
+      min-height: @i+0vh;
+    }
+    &-maxvh@{i} {
+      max-height: @i+0vh;
+    }
+    &-modal-fix-vh@{i} {
+      //模态框固定高度
+      height: @i+0vh;
+      overflow: auto;
+    }
+    .ww(@n, (@i+ @step));
+  }
+}

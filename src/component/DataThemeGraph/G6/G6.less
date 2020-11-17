@@ -1,0 +1,79 @@
+@import "~ant-design-vue/lib/style/index";
+
+@hoverBackground: #4a5e89;
+@nodeBackground: #ebebeb;
+@fontColor: #2b2d2f;
+
+@keyframes background {
+  0% {
+    background: @nodeBackground;
+  }
+  100% {
+    background: @hoverBackground;
+  }
+}
+.graph-container {
+  border: 1px solid #666;
+  height: 300px;
+}
+.node-data-theme {
+  width: 180px;
+  height: 30px;
+  background: @nodeBackground;
+  display: flex;
+  &.hover {
+    background: @hoverBackground;
+    animation: background 0.5s;
+    cursor: move;
+  }
+  &-flag {
+    width: 10px;
+    height: 30px;
+    background: @hoverBackground;
+  }
+  &-name {
+    width: 170px;
+    line-height: 30px;
+    color: #333;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 0 10px;
+    &.hover {
+      color: #fff;
+    }
+  }
+}
+
+.edge-data-theme {
+  width: 30px;
+  height: 30px;
+  background: @nodeBackground;
+  border-radius: 50%;
+}
+
+.mouse-right-menu {
+  min-width: 150px;
+  border: 1px solid #d7dbe4;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  .mouse-right-menu-item {
+    padding: 5px 10px;
+    &:not(:last-child) {
+      border-bottom: 1px solid #d7dbe4;
+    }
+    &:hover {
+      cursor: pointer;
+      opacity: 0.7;
+      background: #f3f5f8;
+      a {
+        color: @primary-color;
+      }
+    }
+    a {
+      color: @fontColor;
+    }
+  }
+}
