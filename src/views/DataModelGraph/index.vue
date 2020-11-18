@@ -1,5 +1,13 @@
 <template>
-  <model-graph v-model="modelData"/>
+  <div :class="classPrefix">
+    <div :class="`${classPrefix}-header`">
+      <div :class="`${classPrefix}-header-zoom`">放大倍数：{{ zoom }}X</div>
+    </div>
+    <div :class="`${classPrefix}-content`">
+      <model-graph v-model="modelData" :currentGraph.sync="graph" />
+    </div>
+    <div :class="`${classPrefix}-footer`"></div>
+  </div>
 </template>
 
 <script>
@@ -10,12 +18,44 @@ export default {
   components: { modelGraph },
   data () {
     return {
-      modelData
+      classPrefix: 'data-model-layout',
+      modelData,
+      graph: {}
+    }
+  },
+  computed: {
+    zoom () {
+      const zoom = Object.keys(this.graph).length ? this.graph.getZoom() : 1.0
+      return zoom.toFixed(1)
     }
   }
 }
 </script>
 
-<style>
+<style lang="less" scope>
+@import '~ant-design-vue/lib/style/index';
+@headerHeight: 30px;
+@FooterHeight: 0px;
 
+.data-model-layout {
+  width: 100%;
+  height: 100vh;
+  overflow: auto;
+  &-header {
+    background: #fff;
+    box-shadow: 0 0 5px 0 #cacaca;
+    height: @headerHeight;
+    &-zoom {
+      height: @headerHeight;
+      line-height: @headerHeight;
+      float: right;
+      padding: 0 20px;
+      color: green;
+    }
+  }
+  &-content {
+    width: 100%;
+    height: calc(100% - @headerHeight);
+  }
+}
 </style>

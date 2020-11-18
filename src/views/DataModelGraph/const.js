@@ -79,6 +79,14 @@ export const modelData = {
       toTableId: '2bb',
       toTableColumnId: 'tb2col1',
       dbInstanceId: 1
+    },
+    {
+      id: 2,
+      fromTableId: '1aa',
+      fromTableColumnId: 'tb1col2',
+      toTableId: '2bb',
+      toTableColumnId: 'tb2col1',
+      dbInstanceId: 1
     }
   ]
 }

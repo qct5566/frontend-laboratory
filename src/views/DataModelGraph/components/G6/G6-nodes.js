@@ -1,6 +1,7 @@
 import G6 from '@antv/g6'
 
 const NodeTable = (vm) => {
+  const textFill = '#1D95E2'
   // 表格节点类型
   G6.registerNode(
     'node-table',
@@ -9,11 +10,12 @@ const NodeTable = (vm) => {
         // 绘制
         // 定义基础字段
         console.log('model', cfg, cfg.x, cfg.y)
-        console.log('group', group)
+        // console.log('group', group)
         const x = cfg.x || 0
         const y = cfg.y || 0
         const padding = 6 // 每列左右内边距
-        const cols = cfg.cols || [ // 定义每列字段
+        const cols = cfg.cols || [
+          // 定义每列字段
           {
             columnName: 'columnName',
             hidden: false
@@ -35,6 +37,7 @@ const NodeTable = (vm) => {
         const colGroups = {} // 列的组元素group
         const colBoxs = {} // 列的包围盒信息bbox
         const tableData = cfg.columns // 表格数据
+        const cursor = 'pointer'
         let colBoxsLen = 0 // 成功生成的列元素个数
         let nodeWidth = cfg.width || 0 // 节点宽
         let nodeHeight = cfg.height || 0 // 节点高
@@ -45,20 +48,19 @@ const NodeTable = (vm) => {
             stroke: 'blue', // 边框颜色
             fill: cfg.color || '#5D616A' // 填充色
           },
-          name: 'container-shape',
-          draggable: true
+          name: 'container-shape'
         })
         // 绘制标题
+
         const title = group.addShape('text', {
           attrs: {
             text: `${cfg.physicalTableName}${cfg.desc ? ` [${cfg.desc}]` : ''}`,
-            fill: '#1D95E2',
+            fill: textFill,
             fontSize: 14
             // textBaseline: 'top',
             // textAlign: 'center'
           },
-          name: 'text-shape',
-          draggable: true
+          name: 'text-shape'
         })
         // 绘制分割线
         const splitLine = group.addShape('line', {
@@ -77,7 +79,8 @@ const NodeTable = (vm) => {
         // 获取头部包围盒
         const titleBox = title.getBBox()
         // 获取每行高度
-        const realLineHeight = (nodeHeight && ((nodeHeight - titleBox.height) / colsLen)) || 20
+        const realLineHeight =
+          (nodeHeight && (nodeHeight - titleBox.height) / colsLen) || 20
         const lineHeight = realLineHeight < 13 ? 13 : realLineHeight
         // 获取每列数据
         const getColumn = (column, columnName) => {
@@ -105,7 +108,8 @@ const NodeTable = (vm) => {
         }
         // 绘制每一列
         tableData.forEach((column, i) => {
-          Object.keys(colGroups).forEach((columnName) => {
+          const colGroupsArr = Object.keys(colGroups)
+          colGroupsArr.forEach((columnName, columnIndex) => {
             const columnInfo = getColumn(column, columnName)
             colGroups[columnName].addShape('text', {
               attrs: {
@@ -116,7 +120,7 @@ const NodeTable = (vm) => {
                 fill: columnInfo.colColor,
                 textBaseline: 'top'
               },
-              name: 'col-text-shape'
+              name: `${columnName}-${i}-text-shape`
             })
             if (column.isPk) {
               // 如果是pk主键，给每列文字下方加下划线
@@ -154,7 +158,9 @@ const NodeTable = (vm) => {
         nodeHeight =
           Math.max(
             ...Object.keys(colBoxs).map((colbox) => colBoxs[colbox].height)
-          ) + 4 * padding + titleBox.height
+          ) +
+          4 * padding +
+          titleBox.height
         // 获取每一行的高度
         const firstGroup = colGroups[Object.keys(colGroups)[0]]
         const rowHeight =
@@ -180,28 +186,25 @@ const NodeTable = (vm) => {
           nodeHeight = titleBox.height * 2
         }
         // 配置背景矩形宽高
-        backRect.attrs = {
-          ...backRect.attrs,
+        backRect.attr({
           x: x - nodeWidth / 2,
           y: y - nodeHeight / 2,
           width: nodeWidth,
           height: nodeHeight
-        }
+        })
         // 配置title位置
-        title.attrs = {
-          ...title.attrs,
-          x: x - (titleBox.width / 2),
+        title.attr({
+          x: x - titleBox.width / 2,
           y: y + titleBox.height,
           width: nodeWidth
-        }
+        })
         // 配置分割线
-        splitLine.attrs = {
-          ...splitLine.attrs,
+        splitLine.attr({
           x1: x - nodeWidth / 2,
           y1: y - nodeHeight / 2 + 2 * padding + titleBox.height,
           x2: x + nodeWidth / 2,
           y2: y - nodeHeight / 2 + 2 * padding + titleBox.height
-        }
+        })
 
         // 配置左右锚点
         const firstBox = colBoxs[Object.keys(colBoxs)[0]]
@@ -219,16 +222,74 @@ const NodeTable = (vm) => {
           anchorPoints.push([1, r])
         })
         // 为每列添加锚点
-        group.set('anchorPoints', anchorPoints)
+        // console.log('anchorPoints', anchorPoints)
+        cfg.anchorPoints = anchorPoints
+        const backRectBox = backRect.getBBox()
+        anchorPoints.forEach(anchorPoint => {
+          const isLeft = anchorPoint[0] === 0
+          const pointYScale = anchorPoint[1]
+          group.addShape('circle', {
+            attrs: {
+              x: backRectBox[isLeft ? 'minX' : 'maxX'],
+              y: backRectBox.y + backRectBox.height * pointYScale + 2,
+              r: 4,
+              fill: textFill,
+              cursor
+            },
+            visible: false,
+            name: `point-${anchorPoint}`
+          })
+        })
+        // console.log('end', cfg)
+        // 添加锚点图形
+        // 获取所有图形
+        const getAllShape = (skapes) => {
+          let skapeList = []
+          skapes &&
+            skapes.length &&
+            skapes.forEach((skape) => {
+              // 排除锚点图形
+              const name = skape.get('name') || ''
+              if (name.indexOf('point-') === -1) {
+                skapeList.push(skape)
+                const children = skape.get('children')
+                if (children && children.length) {
+                  skapeList = [...skapeList, ...getAllShape(children)]
+                }
+              }
+            })
+          return skapeList
+        }
+        const allShape = getAllShape(group.get('children'))
+        allShape.forEach((shape) => {
+          // 为所有图形添加特定属性
+          shape.attr({
+            // cursor
+          })
+          shape.set('draggable', true)
+        })
         return backRect
       },
-      getAnchorPoints (cfg, group) {
-        return group.get('anchorPoints')
+      getAnchorPoints (cfg, anchorPoints) {
+        return cfg.anchorPoints
       },
       setState (name, value, item) {
-        console.log('name, value, item', name, value, item)
-      }
-    }
+        const group = item.get('group')
+        const children = group.get('children')
+        const points = children.filter(e => {
+          const name = e.get('name') || ''
+          return name.indexOf('point-') !== -1
+        })
+        if (name === 'hover') {
+          // 节点hover时展示所有锚点
+          points.forEach(point => {
+            value ? point.show() : point.hide()
+          })
+        }
+      },
+      update: null
+    },
+    'rect'
   )
 }
 

@@ -7,8 +7,9 @@
 <script>
 import G6 from '@antv/g6'
 import { option } from './G6/G6-option'
-import { registerNode } from './G6/G6-node'
+import { registerNode } from './G6/G6-nodes'
 import { registerEdge } from './G6/G6-edges'
+import { graphEvent } from './G6/G6-events'
 export default {
   name: 'DataModelGraph',
   props: {
@@ -24,7 +25,13 @@ export default {
     options: {
       type: Object,
       default () {
-        return { }
+        return {}
+      }
+    },
+    currentGraph: {
+      type: Object,
+      default () {
+        return {}
       }
     }
   },
@@ -32,11 +39,13 @@ export default {
     return {
       container: 'data-model-graph',
       graph: {},
-      data: { // 画布实时数据
+      data: {
+        // 画布实时数据
         nodes: [],
         edges: []
       },
-      oldValue: { // 按照需求回传的数据
+      oldValue: {
+        // 按照需求回传的数据
         nodes: [],
         edges: []
       }
@@ -47,6 +56,9 @@ export default {
       const defaultOptions = {}
       // 设置变化后在此处更新画布
       return { ...defaultOptions, ...this.options }
+    },
+    zoom () {
+      return Object.keys(this.graph).length ? this.graph.getZoom() : 0
     }
   },
   watch: {
@@ -56,6 +68,12 @@ export default {
         if (JSON.stringify(val) !== JSON.stringify(this.oldValue)) {
           this.changeGraph()
         }
+      },
+      deep: true
+    },
+    graph: {
+      handler (val, oldVal) {
+        this.$emit('update:currentGraph', val)
       },
       deep: true
     }
@@ -90,7 +108,7 @@ export default {
       // 自定义边
       registerEdge(this)
       // 获取回填数据
-      this.data = this.getData()
+      this.data = this.getInitData()
       // 获取图容器
       const graphContainer = this.getGraphContainer()
       const { width, height } = graphContainer
@@ -103,26 +121,57 @@ export default {
       this.graph.data(this.data)
       this.graph.render()
       // 初始化事件
-      this.graphEvent()
+      graphEvent(this)
     },
-    graphEvent () {},
-    changeGraph () {},
-    getData () {
+    getInitData () {
       // 将数据处理成G6形式
-      const nodes = this.value.tables.map(e => {
+      const nodes = this.value.tables.map((e) => {
         return {
           ...e,
+          id: e.modelTableId,
+          oldId: e.id,
           type: 'node-table'
         }
       })
-      const edges = [] // this.value.relations.map(e => {
-      //   return {
-      //     ...e,
-      //     type: 'egde-data-model'
-      //   }
-      // })
+      const edges = this.value.relations.map((e) => {
+        const anchor = this.getAnchor(
+          nodes,
+          e.fromTableId,
+          e.fromTableColumnId,
+          e.toTableId,
+          e.toTableColumnId
+        )
+        return {
+          ...e,
+          source: e.fromTableId,
+          target: e.toTableId,
+          type: 'edge-data-model',
+          ...anchor
+        }
+      })
+      console.log('edges', edges)
       return { nodes, edges }
-    }
+    },
+    getAnchor (nodes, sourceId, sourceColumnId, targetId, targetColumnId) {
+      const sourceNode = nodes.find((node) => node.id === sourceId)
+      const targetNode = nodes.find((node) => node.id === targetId)
+      const sourceInLeft = sourceNode.x - targetNode.x < 0
+      const sourcColumneIndex = sourceNode
+        ? sourceNode.columns.findIndex(
+          (col) => col.columnName === sourceColumnId
+        )
+        : 0
+      const targetColumnIndex = targetNode
+        ? targetNode.columns.findIndex(
+          (col) => col.columnName === targetColumnId
+        )
+        : 0
+      return {
+        sourceAnchor: sourcColumneIndex * 2 + (sourceInLeft ? 1 : 0),
+        targetAnchor: targetColumnIndex * 2 + (sourceInLeft ? 0 : 1)
+      }
+    },
+    changeGraph () {}
   }
 }
 </script>
