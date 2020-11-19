@@ -1,6 +1,9 @@
 <template>
   <div :class="classPrefix">
     <div :class="`${classPrefix}-header`">
+      <div :class="`${classPrefix}-header-text`">
+        说明：按住shift后使用鼠标左键框选多个节点
+      </div>
       <div :class="`${classPrefix}-header-zoom`">放大倍数：{{ zoom }}X</div>
     </div>
     <div :class="`${classPrefix}-content`">
@@ -45,10 +48,14 @@ export default {
     background: #fff;
     box-shadow: 0 0 5px 0 #cacaca;
     height: @headerHeight;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    &-text {
+      padding: 0 20px;
+      color: green;
+    }
     &-zoom {
-      height: @headerHeight;
-      line-height: @headerHeight;
-      float: right;
       padding: 0 20px;
       color: green;
     }

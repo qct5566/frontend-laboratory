@@ -1,7 +1,8 @@
 import G6 from '@antv/g6'
 
 const NodeTable = (vm) => {
-  const textFill = '#1D95E2'
+  const titleFill = '#1D95E2'
+  const backRectStroke = 'blue'
   // 表格节点类型
   G6.registerNode(
     'node-table',
@@ -9,8 +10,8 @@ const NodeTable = (vm) => {
       draw (cfg, group) {
         // 绘制
         // 定义基础字段
-        console.log('model', cfg, cfg.x, cfg.y)
-        // console.log('group', group)
+        console.log('nodecfg', cfg, cfg.x, cfg.y)
+        console.log('nodegroup', group)
         const x = cfg.x || 0
         const y = cfg.y || 0
         const padding = 6 // 每列左右内边距
@@ -36,7 +37,7 @@ const NodeTable = (vm) => {
         const colsLen = cols.length // 列个数
         const colGroups = {} // 列的组元素group
         const colBoxs = {} // 列的包围盒信息bbox
-        const tableData = cfg.columns // 表格数据
+        const tableData = cfg.columns// 表格数据
         const cursor = 'pointer'
         let colBoxsLen = 0 // 成功生成的列元素个数
         let nodeWidth = cfg.width || 0 // 节点宽
@@ -45,7 +46,7 @@ const NodeTable = (vm) => {
         // 绘制背景容器
         const backRect = group.addShape('rect', {
           attrs: {
-            stroke: 'blue', // 边框颜色
+            stroke: backRectStroke, // 边框颜色
             fill: cfg.color || '#5D616A' // 填充色
           },
           name: 'container-shape'
@@ -55,7 +56,7 @@ const NodeTable = (vm) => {
         const title = group.addShape('text', {
           attrs: {
             text: `${cfg.physicalTableName}${cfg.desc ? ` [${cfg.desc}]` : ''}`,
-            fill: textFill,
+            fill: titleFill,
             fontSize: 14
             // textBaseline: 'top',
             // textAlign: 'center'
@@ -225,19 +226,19 @@ const NodeTable = (vm) => {
         // console.log('anchorPoints', anchorPoints)
         cfg.anchorPoints = anchorPoints
         const backRectBox = backRect.getBBox()
-        anchorPoints.forEach(anchorPoint => {
+        anchorPoints.forEach((anchorPoint, index) => {
           const isLeft = anchorPoint[0] === 0
           const pointYScale = anchorPoint[1]
           group.addShape('circle', {
             attrs: {
               x: backRectBox[isLeft ? 'minX' : 'maxX'],
-              y: backRectBox.y + backRectBox.height * pointYScale + 2,
+              y: backRectBox.y + backRectBox.height * pointYScale,
               r: 4,
-              fill: textFill,
+              fill: titleFill,
               cursor
             },
             visible: false,
-            name: `point-${anchorPoint}`
+            name: `point-${index}-${anchorPoint}`
           })
         })
         // console.log('end', cfg)
@@ -274,6 +275,8 @@ const NodeTable = (vm) => {
         return cfg.anchorPoints
       },
       setState (name, value, item) {
+        // 事件响应
+        const states = item.get('states')
         const group = item.get('group')
         const children = group.get('children')
         const points = children.filter(e => {
@@ -286,8 +289,14 @@ const NodeTable = (vm) => {
             value ? point.show() : point.hide()
           })
         }
-      },
-      update: null
+        const isSelected = states.includes('selected')
+        // 节点被选中时,添加虚线
+        const backRect = children[0]
+        backRect.attr({
+          lineDash: isSelected ? [6, 3] : []
+        })
+      }
+      // update: null
     },
     'rect'
   )

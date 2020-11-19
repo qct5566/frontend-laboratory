@@ -9,6 +9,7 @@ import G6 from '@antv/g6'
 import { option } from './G6/G6-option'
 import { registerNode } from './G6/G6-nodes'
 import { registerEdge } from './G6/G6-edges'
+import { registerBehavior } from './G6/G6-behavior'
 import { graphEvent } from './G6/G6-events'
 export default {
   name: 'DataModelGraph',
@@ -76,6 +77,12 @@ export default {
         this.$emit('update:currentGraph', val)
       },
       deep: true
+    },
+    data: {
+      handler (val, oldVal) {
+        console.log('endData', this.data)
+      },
+      deep: true
     }
   },
   mounted () {
@@ -107,6 +114,8 @@ export default {
       registerNode(this)
       // 自定义边
       registerEdge(this)
+      // 自定义交互
+      registerBehavior(this)
       // 获取回填数据
       this.data = this.getInitData()
       // 获取图容器

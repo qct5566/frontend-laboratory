@@ -41,7 +41,7 @@ const plugins = (vm) => {
         // console.log(ev)
         return ev.item._cfg.id
       },
-      offsetY: 80
+      offsetY: 30
     })
   ]
 }

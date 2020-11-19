@@ -44,6 +44,13 @@ export const graphEvent = (vm) => {
       value: false
     },
     {
+      // 鼠标点击节点
+      item: 'node',
+      type: 'click',
+      event: 'node:click',
+      value: true
+    },
+    {
       // 鼠标进入边
       item: 'edge',
       type: 'hover',
