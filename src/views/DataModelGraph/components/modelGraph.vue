@@ -59,7 +59,7 @@ export default {
       return { ...defaultOptions, ...this.options }
     },
     zoom () {
-      return Object.keys(this.graph).length ? this.graph.getZoom() : 0
+      return Object.keys(this.graph).length ? this.graph.getZoom() : 1
     }
   },
   watch: {
@@ -75,12 +75,6 @@ export default {
     graph: {
       handler (val, oldVal) {
         this.$emit('update:currentGraph', val)
-      },
-      deep: true
-    },
-    data: {
-      handler (val, oldVal) {
-        console.log('endData', this.data)
       },
       deep: true
     }
@@ -133,12 +127,11 @@ export default {
       graphEvent(this)
     },
     getInitData () {
-      // 将数据处理成G6形式
+      // 将初始数据处理成G6形式
       const nodes = this.value.tables.map((e) => {
         return {
           ...e,
           id: e.modelTableId,
-          oldId: e.id,
           type: 'node-table'
         }
       })
@@ -162,6 +155,7 @@ export default {
       return { nodes, edges }
     },
     getAnchor (nodes, sourceId, sourceColumnId, targetId, targetColumnId) {
+      // 处理节点锚点
       const sourceNode = nodes.find((node) => node.id === sourceId)
       const targetNode = nodes.find((node) => node.id === targetId)
       const sourceInLeft = sourceNode.x - targetNode.x < 0
@@ -179,6 +173,12 @@ export default {
         sourceAnchor: sourcColumneIndex * 2 + (sourceInLeft ? 1 : 0),
         targetAnchor: targetColumnIndex * 2 + (sourceInLeft ? 0 : 1)
       }
+    },
+    getEndData () {
+      // 获取每次数据改变后的data
+      const data = this.graph.save()
+      this.data = data
+      this.$emit('get-data', this.data)
     },
     changeGraph () {}
   }

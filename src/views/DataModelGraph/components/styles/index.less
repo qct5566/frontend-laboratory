@@ -1,8 +1,38 @@
-
 @import "~ant-design-vue/lib/style/index";
+@fontColor: #2b2d2f;
+@delColor: #ff0000;
 
-.graph-container{
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+.graph-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.mouse-right-menu {
+  min-width: 150px;
+  border: 1px solid #d7dbe4;
+  background: #f2f2f2;
+  border-radius: 2px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  .mouse-right-menu-item {
+    padding: 5px 10px;
+    text-align: center;
+    color: @fontColor;
+    //   &:not(:last-child) {
+    //     border-bottom: 1px solid #d7dbe4;
+    //   }
+    &:hover {
+      cursor: pointer;
+      background: @primary-color;
+      color: #fff;
+    }
+    &.del-menu {
+      color: @delColor;
+      &:hover {
+        // background: @delColor;
+        color: #fff;
+      }
+    }
+  }
 }

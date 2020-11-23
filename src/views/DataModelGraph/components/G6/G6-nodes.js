@@ -12,8 +12,8 @@ const NodeTable = (vm) => {
         // 定义基础字段
         console.log('nodecfg', cfg, cfg.x, cfg.y)
         console.log('nodegroup', group)
-        const x = cfg.x || 0
-        const y = cfg.y || 0
+        const x = 0
+        const y = 0
         const padding = 6 // 每列左右内边距
         const cols = cfg.cols || [
           // 定义每列字段
@@ -40,8 +40,8 @@ const NodeTable = (vm) => {
         const tableData = cfg.columns// 表格数据
         const cursor = 'pointer'
         let colBoxsLen = 0 // 成功生成的列元素个数
-        let nodeWidth = cfg.width || 0 // 节点宽
-        let nodeHeight = cfg.height || 0 // 节点高
+        let nodeWidth = cfg.width || 0 // 节点宽,调整后为节点复制时更新
+        let nodeHeight = cfg.height || 0 // 节点高，调整后为节点复制时更新
         // 开始绘制
         // 绘制背景容器
         const backRect = group.addShape('rect', {
@@ -61,7 +61,7 @@ const NodeTable = (vm) => {
             // textBaseline: 'top',
             // textAlign: 'center'
           },
-          name: 'text-shape'
+          name: 'title-shape'
         })
         // 绘制分割线
         const splitLine = group.addShape('line', {
@@ -74,7 +74,9 @@ const NodeTable = (vm) => {
         // 按顺序初始化列名
         cols.forEach((col) => {
           if (group) {
-            colGroups[col.columnName] = group.addGroup()
+            colGroups[col.columnName] = group.addGroup({
+              name: `${col.columnName}-group-shape`
+            })
           }
         })
         // 获取头部包围盒
@@ -92,9 +94,9 @@ const NodeTable = (vm) => {
             case 'pk':
               if (isPk) pkTitles.push('PK')
               if (isFk) pkTitles.push('FK')
-              // <>会造成text无法识别，使用〈〉代替使用
+              // svg时，<>会造成text无法识别，使用〈〉代替使用
               // 因为text无值会造成模块宽度获取错误，这里使用null并设置透明度为0
-              colText = pkTitles.length ? `〈${pkTitles.join(',')}〉` : 'null'
+              colText = pkTitles.length ? `<${pkTitles.join(',')}>` : ''
               break
             default:
               colText = column[columnName]
@@ -114,7 +116,6 @@ const NodeTable = (vm) => {
             const columnInfo = getColumn(column, columnName)
             colGroups[columnName].addShape('text', {
               attrs: {
-                x: x,
                 y: y + lineHeight * i,
                 text: columnInfo.colText,
                 opacity: columnInfo.colText === 'null' ? 0 : 1,
@@ -134,7 +135,8 @@ const NodeTable = (vm) => {
                     x2: box.maxX,
                     y2: box.maxY + 3,
                     stroke: '#C2A412'
-                  }
+                  },
+                  name: `${columnName}-${i}-line-shape`
                 })
             }
           })
@@ -170,14 +172,14 @@ const NodeTable = (vm) => {
             firstGroup.get('children')[0].getBBox().height) ||
           13
         // 采用相对位移坐标来平移 title 位置
-        title.translate(0, -nodeHeight / 2 + padding)
+        // title.translate(0, -nodeHeight / 2 + padding)
         // 调整每一列的位置
         let boxWidth = 0
         Object.keys(colGroups).forEach((colGroup) => {
           // 根据顺序进行宽度叠加
           colGroups[colGroup].translate(
-            -nodeWidth / 2 + boxWidth + padding,
-            -nodeHeight / 2 + titleBox.height + 3 * padding
+            boxWidth + padding,
+            titleBox.height + 3 * padding
           )
           boxWidth += colBoxs[colGroup].width + marginRight
         })
@@ -188,25 +190,24 @@ const NodeTable = (vm) => {
         }
         // 配置背景矩形宽高
         backRect.attr({
-          x: x - nodeWidth / 2,
-          y: y - nodeHeight / 2,
+          x,
+          y,
           width: nodeWidth,
           height: nodeHeight
         })
         // 配置title位置
         title.attr({
-          x: x - titleBox.width / 2,
-          y: y + titleBox.height,
+          x: x + (nodeWidth - titleBox.width) / 2,
+          y: y + titleBox.height + padding,
           width: nodeWidth
         })
         // 配置分割线
         splitLine.attr({
-          x1: x - nodeWidth / 2,
-          y1: y - nodeHeight / 2 + 2 * padding + titleBox.height,
-          x2: x + nodeWidth / 2,
-          y2: y - nodeHeight / 2 + 2 * padding + titleBox.height
+          x1: x,
+          y1: y + 2 * padding + titleBox.height,
+          x2: x + nodeWidth,
+          y2: y + 2 * padding + titleBox.height
         })
-
         // 配置左右锚点
         const firstBox = colBoxs[Object.keys(colBoxs)[0]]
 
@@ -223,7 +224,6 @@ const NodeTable = (vm) => {
           anchorPoints.push([1, r])
         })
         // 为每列添加锚点
-        // console.log('anchorPoints', anchorPoints)
         cfg.anchorPoints = anchorPoints
         const backRectBox = backRect.getBBox()
         anchorPoints.forEach((anchorPoint, index) => {
@@ -238,10 +238,9 @@ const NodeTable = (vm) => {
               cursor
             },
             visible: false,
-            name: `point-${index}-${anchorPoint}`
+            name: `anchor-${index}-${anchorPoint}`
           })
         })
-        // console.log('end', cfg)
         // 添加锚点图形
         // 获取所有图形
         const getAllShape = (skapes) => {
@@ -251,7 +250,7 @@ const NodeTable = (vm) => {
             skapes.forEach((skape) => {
               // 排除锚点图形
               const name = skape.get('name') || ''
-              if (name.indexOf('point-') === -1) {
+              if (name.indexOf('anchor-') === -1) {
                 skapeList.push(skape)
                 const children = skape.get('children')
                 if (children && children.length) {
@@ -279,14 +278,14 @@ const NodeTable = (vm) => {
         const states = item.get('states')
         const group = item.get('group')
         const children = group.get('children')
-        const points = children.filter(e => {
+        const anchors = children.filter(e => {
           const name = e.get('name') || ''
-          return name.indexOf('point-') !== -1
+          return name.indexOf('anchor-') !== -1
         })
         if (name === 'hover') {
           // 节点hover时展示所有锚点
-          points.forEach(point => {
-            value ? point.show() : point.hide()
+          anchors.forEach(anchor => {
+            value ? anchor.show() : anchor.hide()
           })
         }
         const isSelected = states.includes('selected')
@@ -295,10 +294,10 @@ const NodeTable = (vm) => {
         backRect.attr({
           lineDash: isSelected ? [6, 3] : []
         })
+        if (name === 'drop') {
+        }
       }
-      // update: null
-    },
-    'rect'
+    }
   )
 }
 

@@ -1,39 +1,91 @@
 import G6 from '@antv/g6'
-// const defaultRightMenus = [ // 默认节点菜单
-//   {
-//     label: '删除',
-//     value: 'delNode'
-//   }
-// ]
+import { edgeShapeFlag } from './G6-dataType'
+import { addEdgeAnchor } from './G6-events'
+const defaultRightMenus = [
+  // 默认右键菜单
+  {
+    label: '对应关系',
+    value: 'setEdgeType'
+  },
+  {
+    label: '删除连接线',
+    value: 'delEdge'
+  }
+]
+
+let menus = []
+let currentEv = {}
 
 // 配置插件
 const plugins = (vm) => {
   return [
     // 网格 需要启用网格去掉注释即可
     new G6.Grid({
-    // img:''  //String ,grid 图片，base64 格式字符串
+      // img:''  //String ,grid 图片，base64 格式字符串
+    }),
+    // 边的右键菜单配置
+    new G6.Menu({
+      className: 'mouse-right-menu',
+      itemTypes: ['edge'], // 限制只有边开启菜单
+      getContent (ev) {
+        currentEv = ev
+        const shape = ev.shape
+        const shapeName = shape ? shape.get('name') : ''
+        const isEdgeAnchor = shapeName.indexOf(edgeShapeFlag) !== -1
+        const lastMenu = {
+          label: isEdgeAnchor ? '删除锚点' : '添加锚点',
+          value: isEdgeAnchor ? 'delEdgeAnchor' : 'addEdgeAnchor',
+          shape
+        }
+        menus = [...defaultRightMenus, lastMenu]
+        const rightMenus = vm.rightMenus || menus
+        console.log('ev', ev)
+        const outDiv = document.createElement('div')
+        // outDiv.setAttribute('class', 'mouse-right-menu')
+        const domArr = rightMenus.map((e) => {
+          const isDel = e.value.indexOf('del') !== -1
+          return `<div 
+          class="mouse-right-menu-item ${isDel ? 'del-menu' : ''}" 
+           value-menu="${e.value}">
+           ${e.label}
+           </div>`
+        })
+        outDiv.innerHTML = domArr.join().replace(/,/g, '')
+        return outDiv
+      },
+      shouldBegin (ev) {
+        const item = ev.item
+        // 被选中时才能打开右键菜单
+        const selected = item.get('selected')
+        return !!selected
+      },
+      handleMenuClick (target, item) {
+        console.log(target)
+        const type = target.getAttribute('value-menu')
+        const currentMenu = menus.find((e) => e.value === type)
+        const currentShape = currentMenu ? currentMenu.shape : {}
+        console.log('currentItem', currentShape)
+        const group = item.get('group')
+        const model = item.get('model')
+        let name = ''
+        let index
+        switch (type) {
+          case 'delEdge':
+            this.graph.removeItem(item)
+            break
+          case 'delEdgeAnchor':
+            name = currentShape.get('name')
+            index = name.split(`-${edgeShapeFlag}`)[0]
+            model.controlPoints.splice(index, 1)
+            group.removeChild(currentShape)
+            vm.graph.refreshItem(item)
+            break
+          case 'addEdgeAnchor':
+            addEdgeAnchor(currentEv, vm)
+            break
+        }
+      }
     })
-    // 右键菜单
-    // new G6.Menu({
-    //   className: 'mouse-right-menu',
-    //   itemTypes: ['node'], // 限制只有节点开启菜单
-    //   getContent (e) {
-    //     const rightMenus = vm.rightMenus || defaultRightMenus
-    //     const outDiv = document.createElement('div')
-    //     // outDiv.setAttribute('class', 'mouse-right-menu')
-    //     const domArr = rightMenus.map((e) => {
-    //       return `<div class="mouse-right-menu-item" value-menu="${e.value}">
-    //          <a href="javascript:;">${e.label}</a>
-    //       </div>`
-    //     })
-    //     outDiv.innerHTML = domArr.join().replace(/,/g, '')
-    //     return outDiv
-    //   },
-    //   handleMenuClick (target, item) {
-    //     const type = target.getAttribute('value-menu')
-    //     vm.rightMenuOpera(type, item._cfg.model)
-    //   }
-    // })
   ]
 }
 
@@ -50,11 +102,10 @@ export const option = (vm) => {
           multiple: false // 不允许多选
         },
         'brush-select', // 按住shift 框选节点
-        'point-create-edge' // 锚点创建边
+        'anchor-create-edge' // 锚点创建边
       ]
     },
-    defaultNode: {
-    },
+    defaultNode: {},
     defaultEdge: {
       // color: '#c0c0c0', // 默认全局边的颜色
       // size: 2,

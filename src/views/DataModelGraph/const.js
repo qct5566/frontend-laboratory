@@ -9,10 +9,10 @@ export const modelData = {
       physicalTableName: 'table1',
       desc: 'desc!!',
       order: 1,
-      anchorPoints: [
-        [0, 0.76],
-        [1, 0.76]
-      ],
+      // anchorPoints: [
+      //   [0, 0.76],
+      //   [1, 0.76]
+      // ],
       columns: [
         {
           id: '1',
@@ -38,6 +38,21 @@ export const modelData = {
           comment: 'd2',
           isPk: 0,
           isFk: 1,
+          isNull: 0,
+          isAutoIncre: 0,
+          defaultValue: '0',
+          order: 1,
+          isView: null
+        },
+        {
+          id: '3',
+          modelTableId: '1aa',
+          columnName: 'tb1col3',
+          columnDesc: 'd2',
+          columnType: '0',
+          comment: 'd2',
+          isPk: 0,
+          isFk: 0,
           isNull: 0,
           isAutoIncre: 0,
           defaultValue: '0',
@@ -74,7 +89,7 @@ export const modelData = {
           isView: null
         }
       ],
-      x: 300,
+      x: 600,
       y: 100
     },
     {
@@ -104,7 +119,7 @@ export const modelData = {
         }
       ],
       x: 100,
-      y: 200
+      y: 300
     }
   ],
   relations: [
@@ -133,10 +148,10 @@ export const modelData = {
       fromAnchor: 3,
       toAnchor: 0,
       fromArrow: '0,n',
-      toArrow: '1'
-      // controlPoints: [{
-      //   x: 150, y: 100
-      // }]
+      toArrow: '1',
+      controlPoints: [{
+        x: 300, y: 300
+      }]
     }
   ]
 }

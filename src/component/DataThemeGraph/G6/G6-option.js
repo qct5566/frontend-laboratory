@@ -24,7 +24,7 @@ const plugins = (vm) => {
         // outDiv.setAttribute('class', 'mouse-right-menu')
         const domArr = rightMenus.map((e) => {
           return `<div class="mouse-right-menu-item" value-menu="${e.value}">
-             <a href="javascript:;">${e.label}</a>
+             <a href="javascript:;" value-menu="${e.value}">${e.label}</a>
           </div>`
         })
         outDiv.innerHTML = domArr.join().replace(/,/g, '')

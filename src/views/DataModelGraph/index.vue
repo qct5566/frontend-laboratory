@@ -7,7 +7,7 @@
       <div :class="`${classPrefix}-header-zoom`">放大倍数：{{ zoom }}X</div>
     </div>
     <div :class="`${classPrefix}-content`">
-      <model-graph v-model="modelData" :currentGraph.sync="graph" />
+      <model-graph v-model="modelData" :currentGraph.sync="graph" @get-data="getData"/>
     </div>
     <div :class="`${classPrefix}-footer`"></div>
   </div>
@@ -30,6 +30,11 @@ export default {
     zoom () {
       const zoom = Object.keys(this.graph).length ? this.graph.getZoom() : 1.0
       return zoom.toFixed(1)
+    }
+  },
+  methods: {
+    getData (data) {
+      console.log('data', data)
     }
   }
 }
