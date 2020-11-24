@@ -3,7 +3,7 @@ export const edgeShapeFlag = 'edgeAnchor-shape' // 边锚点标识
 export const edgePathShapeName = 'edge-path-shape' // 边线的名称
 export const anchorSize = 8 // 边锚点宽高-默认正方形
 export const edgeAnchorZIndex = 1000 // 边锚点zIndex
-export const lineAppendWidth = 3 // 边的相应范围
+export const lineAppendWidth = 5 // 边的响应范围
 export const anchorAttrs = {
   // 边锚点属性
   stroke: '#666',
@@ -37,4 +37,10 @@ export const edgeShapeEvents = (item, isShow) => {
  */
 export const getZoom = (vm) => {
   return vm.graph ? vm.graph.getZoom() : 1
+}
+
+/** 公用方法 */
+// json方式深拷贝，注意不能拷贝复杂对象
+export const jsonDeepClone = (json) => {
+  return json !== undefined ? JSON.parse(JSON.stringify(json)) : undefined
 }

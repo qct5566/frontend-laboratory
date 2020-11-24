@@ -10,7 +10,7 @@ export const graphEvent = (vm) => {
   // 针对元素的事件
   const itemEvents = [
     {
-      // 鼠标进入锚点
+      // 鼠标点击
       item: 'graph',
       type: 'click',
       event: 'click',
@@ -58,13 +58,13 @@ export const graphEvent = (vm) => {
       event: 'node:mouseleave',
       value: false
     },
-    {
-      // 鼠标点击节点
-      item: 'node',
-      type: 'click',
-      event: 'node:click',
-      value: true
-    },
+    // {
+    //   // 鼠标点击节点
+    //   item: 'node',
+    //   type: 'click',
+    //   event: 'node:click',
+    //   value: true
+    // },
     {
       // 鼠标进入边
       item: 'edge',
@@ -98,7 +98,7 @@ export const graphEvent = (vm) => {
       item: 'edgeAnchor',
       type: 'dblclick',
       event: 'edge:dblclick'
-    }
+    },
     // {
     //   item: 'node',
     //   type: 'drop',
@@ -110,12 +110,12 @@ export const graphEvent = (vm) => {
     //   type: 'drag',
     //   event: 'node:drag'
     // },
-    // {
-    //   item: 'node',
-    //   type: 'drop',
-    //   event: 'node:dragend',
-    //   value: true
-    // }
+    { // 节点拖拽结束后
+      item: 'node',
+      type: 'drop',
+      event: 'node:dragend',
+      value: true
+    }
   ]
   itemEvents.forEach((e) => {
     const itemType = e.item
@@ -141,6 +141,7 @@ export const graphEvent = (vm) => {
           if (type === 'click') {
             // const isEdge = item && item.get('type') === 'edge'
             const allEdge = vm.graph.getEdges()
+            // 隐藏所有边锚点锚点
             allEdge.forEach((e) => {
               edgeShapeEvents(e, false)
             })
@@ -153,6 +154,9 @@ export const graphEvent = (vm) => {
           break
         default:
           vm.graph.setItemState(item, type, value)
+          if (itemType === 'node' && type === 'drop') {
+            vm.getEndData()
+          }
           break
       }
     })
@@ -166,16 +170,18 @@ export const addEdgeAnchor = (ev, vm) => {
   const model = item.get('model')
   model.controlPoints = model.controlPoints || []
   const anchorPoit = { x: ev.x - anchorSize / 2, y: ev.y - anchorSize / 2 }
-
+  // 将锚点插入数组对应的位置
+  const leftArr = model.controlPoints.filter(e => +e.x < +anchorPoit.x)
+  const currentIndex = leftArr.length
   group.addShape('rect', {
     attrs: {
       ...anchorAttrs,
       ...anchorPoit
     },
-    name: `${model.controlPoints.length}-${edgeShapeFlag}`,
+    name: `${currentIndex}-${edgeShapeFlag}`,
     visible: true,
     zIndex: edgeAnchorZIndex
   })
-  model.controlPoints.push(anchorPoit)
+  model.controlPoints.splice(currentIndex, 0, anchorPoit)
   vm.getEndData()
 }

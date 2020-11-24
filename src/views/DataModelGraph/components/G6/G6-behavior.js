@@ -289,7 +289,6 @@ const behaviorAnchorCreateEdge = (vm) => {
           }
           vm.data.nodes.splice(sourceNodeIndex, 1, newSource)
           graph.updateItem(this.sourceNodeId, newSource)
-
           vm.getEndData()
         }
         this.edge = null
@@ -297,7 +296,6 @@ const behaviorAnchorCreateEdge = (vm) => {
       } else if (this.editingEdge && this.edge) {
         // 编辑边
         const isEditL = this.editType === 'L'
-        console.log('isAnchor', isAnchor, isSameNode, isSameRowAnchor, isSameColumnType)
         const isRemove = isEditL
           ? false
           : !isAnchor || (isSameNode && isSameRowAnchor) || !isSameColumnType
@@ -329,9 +327,9 @@ const behaviorAnchorCreateEdge = (vm) => {
             }
           }
           vm.graph.updateItem(this.oldEdge, { ...editEdgeEnd, type: anchorEdgeType })
-          vm.getEndData()
         }
         graph.removeItem(this.edge)
+        vm.getEndData()
         this.oldEdge = null
         this.edge = null
         this.editingEdge = false

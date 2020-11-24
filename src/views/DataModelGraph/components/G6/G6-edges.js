@@ -318,6 +318,7 @@ const EdgeDataModel = (vm) => {
           visible: false,
           zIndex: edgeAnchorZIndex
         })
+        group.sort()
         return edgeShape
       },
       afterDraw: function (cfg, group) {

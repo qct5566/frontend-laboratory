@@ -71,7 +71,7 @@ const plugins = (vm) => {
         let index
         switch (type) {
           case 'delEdge':
-            this.graph.removeItem(item)
+            vm.graph.removeItem(item)
             break
           case 'delEdgeAnchor':
             name = currentShape.get('name')

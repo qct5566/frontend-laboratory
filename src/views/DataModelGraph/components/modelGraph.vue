@@ -11,6 +11,8 @@ import { registerNode } from './G6/G6-nodes'
 import { registerEdge } from './G6/G6-edges'
 import { registerBehavior } from './G6/G6-behavior'
 import { graphEvent } from './G6/G6-events'
+import { jsonDeepClone } from './G6/G6-dataType'
+
 export default {
   name: 'DataModelGraph',
   props: {
@@ -72,6 +74,13 @@ export default {
       },
       deep: true
     },
+    // data: {
+    //   handler (val, oldVal) {
+    //     // 数据变化时传出数据,比较消耗性能，如果可以最好放在各个事件中进行
+    //     this.getEndData()
+    //   },
+    //   deep: true
+    // },
     graph: {
       handler (val, oldVal) {
         this.$emit('update:currentGraph', val)
@@ -123,10 +132,13 @@ export default {
       })
       this.graph.data(this.data)
       this.graph.render()
+      const group = this.graph.get('group')
+      group.sort()
       // 初始化事件
       graphEvent(this)
     },
     getInitData () {
+      console.log('this.value', this.value)
       // 将初始数据处理成G6形式
       const nodes = this.value.tables.map((e) => {
         return {
@@ -148,10 +160,14 @@ export default {
           source: e.fromTableId,
           target: e.toTableId,
           type: 'edge-data-model',
-          ...anchor
+          sourceAnchor:
+            typeof e.fromAnchor === 'number'
+              ? e.fromAnchor
+              : anchor.sourceAnchor,
+          targetAnchor:
+            typeof e.fromAnchor === 'number' ? e.toAnchor : anchor.targetAnchor
         }
       })
-      console.log('edges', edges)
       return { nodes, edges }
     },
     getAnchor (nodes, sourceId, sourceColumnId, targetId, targetColumnId) {
@@ -177,10 +193,33 @@ export default {
     getEndData () {
       // 获取每次数据改变后的data
       const data = this.graph.save()
-      this.data = data
-      this.$emit('get-data', this.data)
+      console.log('this.data1111111', data)
+      const emitData = {
+        tables: data.nodes.map(e => {
+          const item = jsonDeepClone(e)
+          delete item.style
+          delete item.type
+          return item
+        }),
+        relations: data.edges.map(e => {
+          return {
+            ...e,
+            fromTableId: e.source,
+            toTableId: e.target,
+            fromAnchor: e.sourceAnchor,
+            toAnchor: e.targetAnchor
+          }
+        })
+      }
+      this.oldValue = emitData
+      this.$nextTick(() => {
+        this.$emit('get-data', emitData)
+      })
     },
-    changeGraph () {}
+    changeGraph () {
+      this.data = this.getInitData()
+      this.graph.changeData(this.data)
+    }
   }
 }
 </script>

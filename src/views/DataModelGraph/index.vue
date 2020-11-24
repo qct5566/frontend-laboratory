@@ -34,6 +34,7 @@ export default {
   },
   methods: {
     getData (data) {
+      this.modelData = data
       console.log('data', data)
     }
   }
