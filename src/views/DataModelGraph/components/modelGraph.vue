@@ -1,6 +1,9 @@
 <template>
   <div class="graph-container">
     <div :id="container"></div>
+    <div :class="`${container}-tip-text`">
+      按住shift框选多个节点,按下M可打开或关闭缩略图，选中节点后使用delete或backspack删除节点
+    </div>
   </div>
 </template>
 
@@ -51,7 +54,11 @@ export default {
         // 按照需求回传的数据
         nodes: [],
         edges: []
-      }
+      },
+      showMinimap: false,
+      dataLog: [], // 操作日志，用于还原操作
+      currentLogIndex: 0,
+      keydownCtrl: false // 按住ctrl
     }
   },
   computed: {
@@ -68,19 +75,19 @@ export default {
     value: {
       handler (val, oldVal) {
         // 监听数据变化实时更新画布
+        console.log('val', val, this.oldValue)
         if (JSON.stringify(val) !== JSON.stringify(this.oldValue)) {
           this.changeGraph()
         }
       },
       deep: true
     },
-    // data: {
-    //   handler (val, oldVal) {
-    //     // 数据变化时传出数据,比较消耗性能，如果可以最好放在各个事件中进行
-    //     this.getEndData()
-    //   },
-    //   deep: true
-    // },
+    dataLog: {
+      handler (val, oldVal) {
+        console.log('this.dataLog', this.dataLog)
+      },
+      deep: true
+    },
     graph: {
       handler (val, oldVal) {
         this.$emit('update:currentGraph', val)
@@ -136,6 +143,14 @@ export default {
       group.sort()
       // 初始化事件
       graphEvent(this)
+      // 初始化日志
+      this.dataLog = [
+        {
+          index: 0,
+          data: jsonDeepClone(this.data)
+        }
+      ]
+      this.currentLogIndex = 0
     },
     getInitData () {
       console.log('this.value', this.value)
@@ -190,18 +205,41 @@ export default {
         targetAnchor: targetColumnIndex * 2 + (sourceInLeft ? 0 : 1)
       }
     },
-    getEndData () {
-      // 获取每次数据改变后的data
-      const data = this.graph.save()
-      console.log('this.data1111111', data)
+    operaDataLog (type) {
+      // type--- ctrlZ 回退 ctrlY 前进
+      let data = {}
+      if (type === 'ctrlZ') {
+        // 回退时，找到dataLog中的上一项
+        if (this.currentLogIndex !== 0) {
+          data = this.dataLog[this.currentLogIndex - 1].data
+          this.$nextTick(() => {
+            this.currentLogIndex = this.currentLogIndex - 1
+          })
+        }
+      } else if (type === 'ctrlY') {
+        if (this.currentLogIndex !== this.dataLog.length - 1) {
+          data = this.dataLog[this.currentLogIndex + 1].data
+          this.$nextTick(() => {
+            this.currentLogIndex = this.currentLogIndex + 1
+          })
+        }
+      }
+      if (Object.keys(data).length) {
+        this.data = jsonDeepClone(data)
+        this.graph.changeData(this.data)
+        this.getEmitData(data)
+      }
+    },
+    getEmitData (data) {
+      // 回调最终数据
       const emitData = {
-        tables: data.nodes.map(e => {
+        tables: data.nodes.map((e) => {
           const item = jsonDeepClone(e)
           delete item.style
           delete item.type
           return item
         }),
-        relations: data.edges.map(e => {
+        relations: data.edges.map((e) => {
           return {
             ...e,
             fromTableId: e.source,
@@ -211,14 +249,32 @@ export default {
           }
         })
       }
-      this.oldValue = emitData
+      this.oldValue = jsonDeepClone(emitData)
       this.$nextTick(() => {
         this.$emit('get-data', emitData)
       })
     },
+    getEndData () {
+      // 获取每次数据改变后的data
+      const data = this.graph.save()
+      // 保存操作日志
+      // 每次操作都从currentLogIndex开始拼上最新的操作
+      const prveDataLogs = this.dataLog.slice(0, this.currentLogIndex + 1)
+      this.dataLog = [
+        ...prveDataLogs,
+        {
+          index: prveDataLogs.length,
+          data: jsonDeepClone(data)
+        }
+      ]
+      // 更新currentLogIndex
+      this.currentLogIndex = this.dataLog.length - 1
+      this.getEmitData(data)
+    },
     changeGraph () {
       this.data = this.getInitData()
       this.graph.changeData(this.data)
+      this.getEndData()
     }
   }
 }

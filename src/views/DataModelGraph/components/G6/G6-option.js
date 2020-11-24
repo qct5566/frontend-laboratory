@@ -1,5 +1,5 @@
 import G6 from '@antv/g6'
-import { edgeShapeFlag } from './G6-dataType'
+import { edgeShapeFlag, backRectFill } from './G6-dataType'
 import { addEdgeAnchor } from './G6-events'
 const defaultRightMenus = [
   // 默认右键菜单
@@ -84,6 +84,16 @@ const plugins = (vm) => {
             addEdgeAnchor(currentEv, vm)
             break
         }
+      }
+    }),
+    // 预览区域
+    new G6.Minimap({
+      // container:'', //放置 Minimap 的 DOM 容器。若不指定则自动生成
+      size: [225, 150],
+      className: `minimap${vm.showMinimap ? '' : ' minimap-hide'}`,
+      type: 'delegate', // 'delegate'：String,只渲染图上元素的大致图形，以降低渲染成本。渲染成本  'default' > 'keyShape' > 'delegate'
+      delegateStyle: {
+        fill: backRectFill
       }
     })
   ]

@@ -15,6 +15,7 @@ module.exports = {
     'dot-location': [2, 'property'], // 强制在点号之前和之后一致的换行
     curly: [2, 'multi-line'], // 强制所有控制语句使用一致的括号风格
     'comma-dangle': [2, 'never'], // 要求或禁止末尾逗号
+    'no-case-declarations': 0,
     'brace-style': [
       // 强制在代码块中使用一致的大括号风格
       2,

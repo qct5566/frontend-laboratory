@@ -1,3 +1,8 @@
+
+/** ****  节点  ******/
+export const backRectStroke = 'blue' // 节点边框色
+export const backRectFill = '#5D616A' // 节点背景色
+
 /** ****  边  ******/
 export const edgeShapeFlag = 'edgeAnchor-shape' // 边锚点标识
 export const edgePathShapeName = 'edge-path-shape' // 边线的名称

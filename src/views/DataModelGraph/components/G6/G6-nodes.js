@@ -1,8 +1,7 @@
 import G6 from '@antv/g6'
-
+import { backRectStroke, backRectFill } from './G6-dataType'
 const NodeTable = (vm) => {
   const titleFill = '#1D95E2'
-  const backRectStroke = 'blue'
   // 表格节点类型
   G6.registerNode(
     'node-table',
@@ -44,10 +43,11 @@ const NodeTable = (vm) => {
         let nodeHeight = cfg.height || 0 // 节点高，调整后为节点复制时更新
         // 开始绘制
         // 绘制背景容器
+        const titleHasColon = cfg.physicalTableName && cfg.physicalTableName.includes(':')
         const backRect = group.addShape('rect', {
           attrs: {
             stroke: backRectStroke, // 边框颜色
-            fill: cfg.color || '#5D616A' // 填充色
+            fill: titleHasColon ? backRectFill : '#353B47' // 填充色
           },
           name: 'container-shape'
         })

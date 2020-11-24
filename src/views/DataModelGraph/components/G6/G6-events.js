@@ -10,6 +10,20 @@ export const graphEvent = (vm) => {
   // 针对元素的事件
   const itemEvents = [
     {
+      // 操作键盘
+      item: 'graph',
+      type: 'keydown',
+      event: 'keydown',
+      value: false
+    },
+    {
+      // 操作键盘
+      item: 'graph',
+      type: 'keyup',
+      event: 'keyup',
+      value: true
+    },
+    {
       // 鼠标点击
       item: 'graph',
       type: 'click',
@@ -146,6 +160,53 @@ export const graphEvent = (vm) => {
               edgeShapeEvents(e, false)
             })
           }
+          if (type === 'keyup') {
+            console.log('ev.keyCode', ev.keyCode)
+            switch (ev.keyCode) {
+              case 77:
+                // M键切换预览图显隐
+                vm.showMinimap = !vm.showMinimap
+                const minimap = document.querySelector('.minimap')
+                let currentMiniMapClass = minimap.getAttribute('class')
+                currentMiniMapClass = vm.showMinimap
+                  ? currentMiniMapClass.replace(/ minimap-hide/g, '')
+                  : `${currentMiniMapClass} minimap-hide`
+                minimap.setAttribute('class', currentMiniMapClass)
+                break
+              case 46:
+              case 8:
+                // backspace/delete 删除选中节点
+                const allNodes = vm.graph.getNodes()
+                allNodes.forEach(e => {
+                  const states = e.get('states')
+                  if (states.includes('selected')) {
+                    vm.$nextTick(() => {
+                      vm.graph.removeItem(e)
+                    })
+                  }
+                })
+                vm.getEndData()
+                break
+              case 17:
+                // 松开Ctrl
+                vm.keydownCtrl = false
+                break
+              case 90:
+              case 89:
+                // Ctrl+Z操作回退 和Ctrl + Y操作前进
+                console.log('keydownCtrl', vm.keydownCtrl)
+                if (vm.keydownCtrl) {
+                  vm.operaDataLog(ev.keyCode === 90 ? 'ctrlZ' : 'ctrlY')
+                }
+                break
+            }
+          }
+          if (type === 'keydown') {
+            if (ev.keyCode === 17) {
+              // 按住ctrl标识
+              vm.keydownCtrl = true
+            }
+          }
           break
         case 'edgeAnchor':
           if (type === 'dblclick') {
@@ -154,7 +215,7 @@ export const graphEvent = (vm) => {
           break
         default:
           vm.graph.setItemState(item, type, value)
-          if (itemType === 'node' && type === 'drop') {
+          if (itemType === 'node' && event === 'node:dragend') {
             vm.getEndData()
           }
           break
