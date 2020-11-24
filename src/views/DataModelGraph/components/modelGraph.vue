@@ -4,6 +4,12 @@
     <div :class="`${container}-tip-text`">
       按住shift框选多个节点,按下M可打开或关闭缩略图，选中节点后使用delete或backspack删除节点
     </div>
+    <export-graph
+      v-model="exportGraphParams.visible"
+      v-if="exportGraphParams.visible"
+      :obj="exportGraphParams"
+      :graph="graph"
+    />
   </div>
 </template>
 
@@ -15,9 +21,11 @@ import { registerEdge } from './G6/G6-edges'
 import { registerBehavior } from './G6/G6-behavior'
 import { graphEvent } from './G6/G6-events'
 import { jsonDeepClone } from './G6/G6-dataType'
+import exportGraph from './exportGraph'
 
 export default {
   name: 'DataModelGraph',
+  components: { exportGraph },
   props: {
     value: {
       type: Object,
@@ -58,7 +66,10 @@ export default {
       showMinimap: false,
       dataLog: [], // 操作日志，用于还原操作
       currentLogIndex: 0,
-      keydownCtrl: false // 按住ctrl
+      keydownCtrl: false, // 按住ctrl
+      exportGraphParams: {
+        visible: false
+      }
     }
   },
   computed: {
@@ -275,6 +286,12 @@ export default {
       this.data = this.getInitData()
       this.graph.changeData(this.data)
       this.getEndData()
+    },
+    exportGraph () {
+      // 使用ref 调用本方法导出图表
+      this.exportGraphParams = {
+        visible: true
+      }
     }
   }
 }

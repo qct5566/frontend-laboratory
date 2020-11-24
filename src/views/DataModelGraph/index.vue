@@ -15,6 +15,7 @@
     </div>
     <div :class="`${classPrefix}-content`">
       <model-graph
+        ref="modelGraph"
         v-model="modelData"
         :currentGraph.sync="graph"
         @get-data="getData"
@@ -101,7 +102,8 @@ export default {
           this.modelData.tables.push(addItem)
           break
 
-        default:
+        case 'export':
+          this.$refs.modelGraph.exportGraph()
           break
       }
     }

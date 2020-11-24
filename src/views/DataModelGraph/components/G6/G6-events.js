@@ -194,7 +194,6 @@ export const graphEvent = (vm) => {
               case 90:
               case 89:
                 // Ctrl+Z操作回退 和Ctrl + Y操作前进
-                console.log('keydownCtrl', vm.keydownCtrl)
                 if (vm.keydownCtrl) {
                   vm.operaDataLog(ev.keyCode === 90 ? 'ctrlZ' : 'ctrlY')
                 }
