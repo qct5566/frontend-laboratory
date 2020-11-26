@@ -7,12 +7,10 @@ export default {
       required: true
     },
     obj: {
-      // 必须包含当前边，左右节点，全部节点和边数据
       type: Object,
       default () {
-        return { }
-      },
-      required: true
+        return {}
+      }
     }
   },
   methods: {

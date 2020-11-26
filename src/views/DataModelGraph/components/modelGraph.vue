@@ -10,6 +10,12 @@
       :obj="exportGraphParams"
       :graph="graph"
     />
+    <set-edge-type
+      v-model="setEdgeTypeParams.visible"
+      v-if="setEdgeTypeParams.visible"
+      :obj="setEdgeTypeParams"
+      @after-save="afterSave"
+    />
   </div>
 </template>
 
@@ -22,10 +28,11 @@ import { registerBehavior } from './G6/G6-behavior'
 import { graphEvent } from './G6/G6-events'
 import { jsonDeepClone } from './G6/G6-dataType'
 import exportGraph from './exportGraph'
+import SetEdgeType from './setEdgeType'
 
 export default {
   name: 'DataModelGraph',
-  components: { exportGraph },
+  components: { exportGraph, SetEdgeType },
   props: {
     value: {
       type: Object,
@@ -69,6 +76,10 @@ export default {
       keydownCtrl: false, // 按住ctrl
       exportGraphParams: {
         visible: false
+      },
+      setEdgeTypeParams: {
+        visible: false,
+        row: {}
       }
     }
   },
@@ -287,10 +298,24 @@ export default {
       this.graph.changeData(this.data)
       this.getEndData()
     },
+    setEdgeTypeModal (item) {
+      // 打开编辑连线关系弹窗
+      this.setEdgeTypeParams = {
+        visible: true,
+        row: item
+      }
+    },
     exportGraph () {
       // 使用ref 调用本方法导出图表
       this.exportGraphParams = {
         visible: true
+      }
+    },
+    afterSave (type, item) {
+      switch (type) {
+        case 'setEdgeType':
+          this.graph.refreshItem(item)
+          break
       }
     }
   }

@@ -39,7 +39,6 @@ const plugins = (vm) => {
         }
         menus = [...defaultRightMenus, lastMenu]
         const rightMenus = vm.rightMenus || menus
-        console.log('ev', ev)
         const outDiv = document.createElement('div')
         // outDiv.setAttribute('class', 'mouse-right-menu')
         const domArr = rightMenus.map((e) => {
@@ -60,16 +59,17 @@ const plugins = (vm) => {
         return !!selected
       },
       handleMenuClick (target, item) {
-        console.log(target)
         const type = target.getAttribute('value-menu')
         const currentMenu = menus.find((e) => e.value === type)
         const currentShape = currentMenu ? currentMenu.shape : {}
-        console.log('currentItem', currentShape)
         const group = item.get('group')
         const model = item.get('model')
         let name = ''
         let index
         switch (type) {
+          case 'setEdgeType':
+            vm.setEdgeTypeModal(item)
+            break
           case 'delEdge':
             vm.graph.removeItem(item)
             break

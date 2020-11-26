@@ -9,11 +9,9 @@ const NodeTable = (vm) => {
       draw (cfg, group) {
         // 绘制
         // 定义基础字段
-        console.log('nodecfg', cfg, cfg.x, cfg.y)
-        console.log('nodegroup', group)
         const x = 0
         const y = 0
-        const padding = 6 // 每列左右内边距
+        const padding = 10 // 每列左右内边距
         const cols = cfg.cols || [
           // 定义每列字段
           {
@@ -39,11 +37,12 @@ const NodeTable = (vm) => {
         const tableData = cfg.columns// 表格数据
         const cursor = 'pointer'
         let colBoxsLen = 0 // 成功生成的列元素个数
-        let nodeWidth = cfg.width || 0 // 节点宽,调整后为节点复制时更新
-        let nodeHeight = cfg.height || 0 // 节点高，调整后为节点复制时更新
+        let nodeWidth = cfg.nodeWidth || 0 // 节点宽,调整后为节点复制时更新
+        let nodeHeight = cfg.nodeHeight || 0 // 节点高，调整后为节点复制时更新
         // 开始绘制
         // 绘制背景容器
-        const titleHasColon = cfg.physicalTableName && cfg.physicalTableName.includes(':')
+        const titleHasColon = cfg.name &&
+        (cfg.name.includes(':') || (cfg.name.includes('<<') && cfg.name.includes('>>')))
         const backRect = group.addShape('rect', {
           attrs: {
             stroke: backRectStroke, // 边框颜色
@@ -55,7 +54,7 @@ const NodeTable = (vm) => {
 
         const title = group.addShape('text', {
           attrs: {
-            text: `${cfg.physicalTableName}${cfg.desc ? ` [${cfg.desc}]` : ''}`,
+            text: cfg.name,
             fill: titleFill,
             fontSize: 14
             // textBaseline: 'top',
@@ -151,12 +150,13 @@ const NodeTable = (vm) => {
         }, 0)
         // 生成列组元素后获取组元素个数
         colBoxsLen = Object.keys(colBoxs).length
+        // 和标题宽度对比，取最大
+        nodeWidth = Math.max(titleBox.width, allColWidth)
         // 计算每列右边距
-        const offsetRight =
-          ((nodeWidth || allColWidth) - allColWidth) / colsLen
+        const offsetRight = (nodeWidth - allColWidth) / (colBoxsLen - 1)
         const marginRight = offsetRight < 0 ? 10 : offsetRight + 10
         // 节点最终宽度
-        nodeWidth = allColWidth + marginRight * colBoxsLen + 2 * padding
+        nodeWidth = allColWidth + marginRight * (colBoxsLen - 1) + 2 * padding
         // 获取所有列中最大高度加title高度，即节点高度
         nodeHeight =
           Math.max(
@@ -183,11 +183,11 @@ const NodeTable = (vm) => {
           )
           boxWidth += colBoxs[colGroup].width + marginRight
         })
-        if (colBoxsLen === 0) {
-          // 没有列元素的时候需要有一个默认宽度
-          nodeWidth = titleBox.width
-          nodeHeight = titleBox.height * 2
-        }
+        // if (colBoxsLen === 0) {
+        //   // 没有列元素的时候需要有一个默认宽度
+        //   nodeWidth = titleBox.width
+        //   nodeHeight = titleBox.height * 2
+        // }
         // 配置背景矩形宽高
         backRect.attr({
           x,

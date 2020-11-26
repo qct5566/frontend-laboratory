@@ -1,14 +1,15 @@
-import {
-  edgeShapeEvents,
-  anchorAttrs,
-  anchorSize,
-  edgeAnchorZIndex,
-  edgeShapeFlag
-} from './G6-dataType'
+import { edgeShapeEvents, anchorAttrs, anchorSize, edgeAnchorZIndex, edgeShapeFlag } from './G6-dataType'
 
-export const graphEvent = (vm) => {
+export const graphEvent = vm => {
   // 针对元素的事件
   const itemEvents = [
+    {
+      // 拖拽结束后
+      item: 'graph',
+      type: 'drop',
+      event: 'drop',
+      value: true
+    },
     {
       // 操作键盘
       item: 'graph',
@@ -124,17 +125,18 @@ export const graphEvent = (vm) => {
     //   type: 'drag',
     //   event: 'node:drag'
     // },
-    { // 节点拖拽结束后
+    {
+      // 节点拖拽结束后
       item: 'node',
       type: 'drop',
       event: 'node:dragend',
       value: true
     }
   ]
-  itemEvents.forEach((e) => {
+  itemEvents.forEach(e => {
     const itemType = e.item
     const { value, event, type } = e
-    vm.graph.on(event, (ev) => {
+    vm.graph.on(event, ev => {
       const item = ev.item
       const name = ev.name || ''
       const shape = ev.shape
@@ -151,61 +153,8 @@ export const graphEvent = (vm) => {
           }
           break
         case 'graph':
-          // 点击事件触发
-          if (type === 'click') {
-            // const isEdge = item && item.get('type') === 'edge'
-            const allEdge = vm.graph.getEdges()
-            // 隐藏所有边锚点锚点
-            allEdge.forEach((e) => {
-              edgeShapeEvents(e, false)
-            })
-          }
-          if (type === 'keyup') {
-            console.log('ev.keyCode', ev.keyCode)
-            switch (ev.keyCode) {
-              case 77:
-                // M键切换预览图显隐
-                vm.showMinimap = !vm.showMinimap
-                const minimap = document.querySelector('.minimap')
-                let currentMiniMapClass = minimap.getAttribute('class')
-                currentMiniMapClass = vm.showMinimap
-                  ? currentMiniMapClass.replace(/ minimap-hide/g, '')
-                  : `${currentMiniMapClass} minimap-hide`
-                minimap.setAttribute('class', currentMiniMapClass)
-                break
-              case 46:
-              case 8:
-                // backspace/delete 删除选中节点
-                const allNodes = vm.graph.getNodes()
-                allNodes.forEach(e => {
-                  const states = e.get('states')
-                  if (states.includes('selected')) {
-                    vm.$nextTick(() => {
-                      vm.graph.removeItem(e)
-                    })
-                  }
-                })
-                vm.getEndData()
-                break
-              case 17:
-                // 松开Ctrl
-                vm.keydownCtrl = false
-                break
-              case 90:
-              case 89:
-                // Ctrl+Z操作回退 和Ctrl + Y操作前进
-                if (vm.keydownCtrl) {
-                  vm.operaDataLog(ev.keyCode === 90 ? 'ctrlZ' : 'ctrlY')
-                }
-                break
-            }
-          }
-          if (type === 'keydown') {
-            if (ev.keyCode === 17) {
-              // 按住ctrl标识
-              vm.keydownCtrl = true
-            }
-          }
+
+          graphEventType(type, ev, vm)
           break
         case 'edgeAnchor':
           if (type === 'dblclick') {
@@ -221,6 +170,76 @@ export const graphEvent = (vm) => {
       }
     })
   })
+}
+
+/**
+ * 处理画布事件
+ * @param {string} type 事件类型
+ * @param {event} ev  event数据
+ * @param {context} vm  vue组件的this
+ */
+const graphEventType = (type, ev, vm) => {
+  switch (type) {
+    case 'click':
+      // 点击事件触发
+      // const isEdge = item && item.get('type') === 'edge'
+      const allEdge = vm.graph.getEdges()
+      // 隐藏所有边锚点锚点
+      allEdge.forEach(e => {
+        edgeShapeEvents(e, false)
+      })
+      break
+    case 'keyup':
+      console.log('ev.keyCode', ev.keyCode)
+      switch (ev.keyCode) {
+        case 77:
+          // M键切换预览图显隐
+          vm.showMinimap = !vm.showMinimap
+          const minimap = document.querySelector('.minimap')
+          let currentMiniMapClass = minimap.getAttribute('class')
+          currentMiniMapClass = vm.showMinimap
+            ? currentMiniMapClass.replace(/ minimap-hide/g, '')
+            : `${currentMiniMapClass} minimap-hide`
+          minimap.setAttribute('class', currentMiniMapClass)
+          break
+        case 46:
+        case 8:
+          // backspace/delete 删除选中节点
+          const allNodes = vm.graph.getNodes()
+          allNodes.forEach(e => {
+            const states = e.get('states')
+            if (states.includes('selected')) {
+              vm.$nextTick(() => {
+                vm.graph.removeItem(e)
+              })
+            }
+          })
+          vm.getEndData()
+          break
+        case 17:
+          // 松开Ctrl
+          vm.keydownCtrl = false
+          break
+        case 90:
+        case 89:
+          // Ctrl+Z操作回退 和Ctrl + Y操作前进
+          if (vm.keydownCtrl) {
+            vm.operaDataLog(ev.keyCode === 90 ? 'ctrlZ' : 'ctrlY')
+          }
+          break
+      }
+      break
+    case 'keydown':
+      if (ev.keyCode === 17) {
+        // 按住ctrl标识
+        vm.keydownCtrl = true
+      }
+      break
+    case 'drop':
+      // 外部模块拖拽到图表时的处理
+      vm.$emit('graph-drop', ev)
+      break
+  }
 }
 
 export const addEdgeAnchor = (ev, vm) => {

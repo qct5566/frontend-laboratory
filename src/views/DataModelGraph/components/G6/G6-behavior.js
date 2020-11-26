@@ -82,7 +82,6 @@ export const setEditEdge = (key, point, model, anchorIndex) => {
 }
 
 const getColumn = (node, index) => {
-  console.log('node', node)
   const nodeModel = node.get('model')
   const columns = nodeModel.columns
   return columns[index]
@@ -162,7 +161,6 @@ const behaviorAnchorCreateEdge = (vm) => {
         const isEnd = shapeName.indexOf('end-') !== -1
         const editType = isStart ? 'start' : isEnd ? 'end' : 'L'
         const LIndex = shapeName.split(`-${edgeShapeFlag}`)[0]
-        console.log('edge', edge)
         // 开始编辑边
         if (!this.editingEdge || !this.edge) {
           switch (editType) {
@@ -264,7 +262,6 @@ const behaviorAnchorCreateEdge = (vm) => {
            * 第一个坐标 x轴 位于s锚点30的绝对值位置，
            *           y轴 如果起始锚点在节点一半的上方，
            */
-          console.log('this.edge', this.edge)
           graph.updateItem(this.edge, {
             target: nodeId,
             targetAnchor: anchor,
@@ -302,7 +299,6 @@ const behaviorAnchorCreateEdge = (vm) => {
         if (!isRemove) {
           let editEdgeEnd = {}
           if (isEditL) {
-            console.log('this.edge', this.edge)
             const edgeModel = this.edge.get('model')
             editEdgeEnd = {
               controlPoints: edgeModel.controlPoints || []

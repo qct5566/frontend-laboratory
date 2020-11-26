@@ -23,6 +23,6 @@ export const constantRouterMap = [
     path: '/DataModelGraph',
     name: 'DataModelGraph',
     meta: { title: 'DataModelGraph' },
-    component: () => import('@/views/DataModelGraph')
+    component: () => import('@/views/DataModelGraph/demo')
   }
 ]

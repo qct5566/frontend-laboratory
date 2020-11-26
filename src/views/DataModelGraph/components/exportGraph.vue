@@ -2,7 +2,7 @@
   <a-modal
     title="选中图片导出类型"
     :visible="value"
-    width="70%"
+    width="60%"
     :mask-closable="false"
     @cancel="handleCancel"
     @ok="handleOk"

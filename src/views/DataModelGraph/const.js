@@ -1,18 +1,33 @@
 export const modelData = {
   tables: [
     {
-      modelTableId: '1aa',
+      code: null,
+      comment: 'desc!!',
+      count: null,
+      createBy: null,
+      createByName: null,
+      createTime: null,
+      databaseId: '1aa',
       dbInstanceId: 1,
-      typeName: 'mysql',
-      modelName: 'tablemodel1',
-      modelNo: '1',
-      physicalTableName: 'table1',
-      desc: 'desc!!',
+      dbType: 'mysql',
+      id: 'adfgsdgfsdfgsgfsdfgxddf',
+      indexNames: null,
+      instanceId: null,
+      isParent: false,
+      loading: false,
+      modelNum: '1',
+      name: 'testtable2【测试表格2】',
       order: 1,
-      // anchorPoints: [
-      //   [0, 0.76],
-      //   [1, 0.76]
-      // ],
+      parentId: '1aa',
+      partirionKeys: null,
+      physicalName: '测试表格2',
+      primaryKeys: null,
+      realId: null,
+      realParentId: null,
+      schema: null,
+      systemId: null,
+      type: 'table',
+      updateTime: 1606159424000,
       columns: [
         {
           id: '1',
@@ -64,14 +79,33 @@ export const modelData = {
       y: 100
     },
     {
-      modelTableId: '2bb',
+      code: null,
+      comment: 'desc!!',
+      count: null,
+      createBy: null,
+      createByName: null,
+      createTime: null,
+      databaseId: '1aa',
       dbInstanceId: 1,
-      typeName: 'mysql',
-      modelName: 'tablemodel2',
-      modelNo: '1',
-      physicalTableName: 'table2',
-      desc: 'desc!!',
+      dbType: 'mysql',
+      id: 'asdfasfasdfasdfas',
+      indexNames: null,
+      instanceId: null,
+      isParent: false,
+      loading: false,
+      modelNum: '1',
+      name: 'tesbiaot【测试表格1】',
       order: 1,
+      parentId: '1aa',
+      partirionKeys: null,
+      physicalName: '测试表格1',
+      primaryKeys: null,
+      realId: null,
+      realParentId: null,
+      schema: null,
+      systemId: null,
+      type: 'table',
+      updateTime: 1606159418000,
       columns: [
         {
           id: '3',
@@ -91,67 +125,84 @@ export const modelData = {
       ],
       x: 600,
       y: 100
-    },
-    {
-      modelTableId: '3cc',
-      dbInstanceId: 1,
-      typeName: 'mysql',
-      modelName: 'tablemodel3',
-      modelNo: '1',
-      physicalTableName: 'table2',
-      desc: 'desc!!',
-      order: 1,
-      columns: [
-        {
-          id: '3',
-          modelTableId: '2bb',
-          columnName: 'tb2col1',
-          columnDesc: 'd2',
-          columnType: '0',
-          comment: 'd2',
-          isPk: 0,
-          isFk: 0,
-          isNull: 0,
-          isAutoIncre: 0,
-          defaultValue: '0',
-          order: 1,
-          isView: null
-        }
-      ],
-      x: 100,
-      y: 300
     }
   ],
   relations: [
+    // {
+    //   id: 1,
+    //   fromTableId: 'adfgsdgfsdfgsgfsdfgxddf',
+    //   fromTableColumnId: 'tb1col1',
+    //   toTableId: 'asdfasfasdfasdfas',
+    //   toTableColumnId: 'tb2col1',
+    //   dbInstanceId: 1,
+    //   fromAnchor: 1,
+    //   toAnchor: 0,
+    //   fromArrow: '0,n',
+    //   toArrow: '1',
+    //   controlPoints: [{
+    //     x: 450, y: 100
+    //   }]
+    // }
+    // {
+    //   id: 2,
+    //   fromTableId: '1aa',
+    //   fromTableColumnId: 'tb1col2',
+    //   toTableId: '2bb',
+    //   toTableColumnId: 'tb2col1',
+    //   dbInstanceId: 1,
+    //   fromAnchor: 3,
+    //   toAnchor: 0,
+    //   fromArrow: '0,n',
+    //   toArrow: '1',
+    //   controlPoints: [{
+    //     x: 300, y: 300
+    //   }]
+    // }
+  ]
+}
+
+export const addItem = {
+  code: null,
+  comment: 'desc!!',
+  count: null,
+  createBy: null,
+  createByName: null,
+  createTime: null,
+  databaseId: '1aa',
+  dbInstanceId: 1,
+  dbType: 'mysql',
+  indexNames: null,
+  instanceId: null,
+  isParent: false,
+  loading: false,
+  modelNum: '1',
+  name: 'testtable2【测试表格2】',
+  order: 1,
+  parentId: '1aa',
+  partirionKeys: null,
+  physicalName: '测试表格2',
+  primaryKeys: null,
+  realId: null,
+  realParentId: null,
+  schema: null,
+  systemId: null,
+  type: 'table',
+  updateTime: 1606159424000,
+  columns: [
     {
-      id: 1,
-      fromTableId: '1aa',
-      fromTableColumnId: 'tb1col1',
-      toTableId: '2bb',
-      toTableColumnId: 'tb2col1',
-      dbInstanceId: 1,
-      fromAnchor: 1,
-      toAnchor: 0,
-      fromArrow: '0,n',
-      toArrow: '1'
-      // controlPoints: [{
-      //   x: 150, y: 100
-      // }]
-    },
-    {
-      id: 2,
-      fromTableId: '1aa',
-      fromTableColumnId: 'tb1col2',
-      toTableId: '2bb',
-      toTableColumnId: 'tb2col1',
-      dbInstanceId: 1,
-      fromAnchor: 3,
-      toAnchor: 0,
-      fromArrow: '0,n',
-      toArrow: '1',
-      controlPoints: [{
-        x: 300, y: 300
-      }]
+      id: '3',
+      modelTableId: '2bb',
+      columnName: 'tb2col1',
+      columnDesc: 'd2',
+      columnType: '0',
+      comment: 'd2',
+      isPk: 0,
+      isFk: 0,
+      isNull: 0,
+      isAutoIncre: 0,
+      defaultValue: '0',
+      order: 1,
+      isView: null
     }
   ]
 }
