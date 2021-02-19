@@ -5,7 +5,19 @@
 export const constantRouterMap = [
   {
     path: '/',
-    redirect: 'DataModelGraph'
+    redirect: 'vue3DModel'
+  },
+  {
+    path: '/vue3DModel',
+    name: 'vue3DModel',
+    meta: { title: 'vue3DModel' },
+    component: () => import('@/views/Three/vue-3d-model/demo1')
+  },
+  {
+    path: '/L7',
+    name: 'L7',
+    meta: { title: 'L7' },
+    component: () => import('@/views/L7')
   },
   {
     path: '/G6',

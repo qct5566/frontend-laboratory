@@ -8,7 +8,7 @@ import notification from 'ant-design-vue/es/notification'
 import {
   ACCESS_TOKEN
 } from '@/store/mutation-types'
-import { clearParams } from '@/utils/data'
+// import { clearParams } from '@/utils/data'
 import router from '@/router'
 
 const _env = process.env.NODE_ENV
@@ -145,8 +145,8 @@ export const requestHandler = (config, reqParams) => {
   config.params = { ...config.params, ...params }
   if (config.method === 'get') {
     // get请求时候删除空参数
-    clearParams(config.params)
-    clearParams(config.data)
+    // clearParams(config.params)
+    // clearParams(config.data)
   }
   url = config.url
   if (useGlobalLoading) {

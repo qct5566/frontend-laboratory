@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import LwSelect from '@#/components/LwSelect'
+import LwSelect from '@/component/LwSelect'
 import modalMixin from './mixins/modalMixin'
 const list = [
   {

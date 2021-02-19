@@ -10,6 +10,7 @@
           @click="opera(item.value, item)"
         >{{ item.label }}</a-button
         >
+        <a-icon :component="icontest" />
       </div>
       <div :class="`${classPrefix}-header-zoom`">放大倍数：{{ zoom }}X</div>
     </div>
@@ -29,6 +30,11 @@
 import modelGraph from './index'
 import { modelData } from './const'
 import uuid from 'uuid'
+const url = __dirname.substring(0, __dirname.indexOf('\\src')) + '/src/assets'
+console.log('url', process.env, __dirname, url)
+const ass = '@'
+const type = 'pzgl'
+const icon = require(`${ass}/assets/${type}.svg?inline`).default
 export default {
   name: 'DataModelGraphDom',
   components: { modelGraph },
@@ -46,7 +52,8 @@ export default {
           label: '新增',
           value: 'add'
         }
-      ]
+      ],
+      icontest: icon
     }
   },
   computed: {
